@@ -4,5 +4,29 @@
     "version": "1.0.0",
     "title": "My Zuplo API"
   },
-  "paths": {}
+  "paths": {
+    "/context-test": {
+      "x-zuplo-path": {
+        "pathMode": "open-api"
+      },
+      "get": {
+        "operationId": "contextTest",
+        "x-zuplo-route": {
+          "corsPolicy": "none",
+          "handler": {
+            "export": "default",
+            "module": "$import(./modules/response-sending-final-hook)"
+          },
+          "policies": {
+            "inbound": []
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Modified response"
+          }
+        }
+      }
+    }
+  }
 }
