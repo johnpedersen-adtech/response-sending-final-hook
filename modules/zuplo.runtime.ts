@@ -1,6 +1,9 @@
 import { OpenTelemetryPlugin } from "@zuplo/otel";
 import { environment, type RuntimeExtensions } from "@zuplo/runtime";
 import { McpGatewayPlugin } from "@zuplo/runtime/mcp-gateway";
+import { modifiedResponse } from "./response-sending-final-hook";
+
+const runtimeTestPath = "/runtime-test";
 
 /**
  * `runtimeInit` runs once when your gateway boots. Use it to register plugins
@@ -8,6 +11,24 @@ import { McpGatewayPlugin } from "@zuplo/runtime/mcp-gateway";
  * https://zuplo.com/docs/programmable-api/runtime-extensions
  */
 export function runtimeInit(runtime: RuntimeExtensions) {
+  // Keep the runtime and context reproductions independent.
+  runtime.addResponseSendingHook((response, request) => {
+    return new URL(request.url).pathname === runtimeTestPath
+      ? modifiedResponse()
+      : response;
+  });
+
+  runtime.addResponseSendingFinalHook(async (response, request, context) => {
+    if (new URL(request.url).pathname !== runtimeTestPath) {
+      return;
+    }
+
+    context.log.info("Runtime final response hook", {
+      status: response.status,
+      body: await response.clone().text(),
+    });
+  });
+
   // --- MCP Gateway ---------------------------------------------------------
   // Registers the MCP Gateway, which adds the OAuth and upstream-connection
   // routes used to expose and secure MCP servers through your gateway. It is a

@@ -27,6 +27,29 @@
           }
         }
       }
+    },
+    "/runtime-test": {
+      "x-zuplo-path": {
+        "pathMode": "open-api"
+      },
+      "get": {
+        "operationId": "runtimeTest",
+        "x-zuplo-route": {
+          "corsPolicy": "none",
+          "handler": {
+            "export": "originalResponse",
+            "module": "$import(./modules/response-sending-final-hook)"
+          },
+          "policies": {
+            "inbound": []
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Modified response"
+          }
+        }
+      }
     }
   }
 }
